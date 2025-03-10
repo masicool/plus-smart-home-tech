@@ -2,7 +2,6 @@ package ru.practicum.telemetry.service.handler.hub;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.telemetry.kafka.EventKafkaProducer;
-import ru.practicum.telemetry.kafka.KafkaConfig;
 import ru.practicum.telemetry.model.hub.HubEvent;
 import ru.practicum.telemetry.model.hub.HubEventType;
 import ru.practicum.telemetry.model.hub.scenario.DeviceAction;
@@ -14,8 +13,8 @@ import java.util.List;
 
 @Component
 public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAddedEventAvro> {
-    protected ScenarioAddedHubEventHandler(EventKafkaProducer producer, KafkaConfig kafkaConfig) {
-        super(producer, kafkaConfig);
+    protected ScenarioAddedHubEventHandler(EventKafkaProducer producer) {
+        super(producer);
     }
 
     @Override

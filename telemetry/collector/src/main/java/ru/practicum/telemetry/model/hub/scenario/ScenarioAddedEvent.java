@@ -21,10 +21,8 @@ public class ScenarioAddedEvent extends HubEvent {
     @NotNull
     @Size(min = 3)
     String name; // название добавленного сценария
-    @NotNull
     @NotEmpty
     List<ScenarioCondition> conditions; // список условий, которые связаны со сценарием
-    @NotNull
     @NotEmpty
     List<DeviceAction> actions; // список действий, которые должны быть выполнены в рамках сценария
 

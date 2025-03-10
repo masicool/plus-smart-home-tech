@@ -3,18 +3,17 @@ package ru.practicum.telemetry.service.handler.hub;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import ru.practicum.telemetry.kafka.EventKafkaProducer;
-import ru.practicum.telemetry.kafka.KafkaConfig;
 import ru.practicum.telemetry.model.hub.HubEvent;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+
+import static ru.practicum.telemetry.kafka.KafkaTopic.HUBS_EVENTS;
 
 @Slf4j
 public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implements HubEventHandler {
     private final EventKafkaProducer producer;
-    private final KafkaConfig kafkaConfig;
 
-    protected BaseHubEventHandler(EventKafkaProducer producer, KafkaConfig kafkaConfig) {
+    protected BaseHubEventHandler(EventKafkaProducer producer) {
         this.producer = producer;
-        this.kafkaConfig = kafkaConfig;
     }
 
     @Override
@@ -32,7 +31,7 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
                 .build();
 
         log.info("Hub event received: {}", avro);
-        producer.send(avro, event.getHubId(), event.getTimestamp(), kafkaConfig.getTopics().get("hubs-events"));
+        producer.send(avro, event.getHubId(), event.getTimestamp(), HUBS_EVENTS);
     }
 
     protected abstract T mapToAvro(HubEvent event);

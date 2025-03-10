@@ -2,7 +2,6 @@ package ru.practicum.telemetry.service.handler.sensor;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.telemetry.kafka.EventKafkaProducer;
-import ru.practicum.telemetry.kafka.KafkaConfig;
 import ru.practicum.telemetry.model.sensor.SensorEvent;
 import ru.practicum.telemetry.model.sensor.SensorEventType;
 import ru.practicum.telemetry.model.sensor.SwitchSensorEvent;
@@ -10,8 +9,8 @@ import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 
 @Component
 public class SwitchSensorEventHandler extends BaseSensorEventHandler<SwitchSensorAvro> {
-    protected SwitchSensorEventHandler(EventKafkaProducer producer, KafkaConfig kafkaConfig) {
-        super(producer, kafkaConfig);
+    protected SwitchSensorEventHandler(EventKafkaProducer producer) {
+        super(producer);
     }
 
     @Override
