@@ -1,15 +1,16 @@
 package ru.practicum.telemetry.controller;
 
-import jakarta.validation.Valid;
+import com.google.protobuf.Empty;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import ru.practicum.telemetry.model.hub.HubEvent;
-import ru.practicum.telemetry.model.hub.HubEventType;
-import ru.practicum.telemetry.model.sensor.SensorEvent;
-import ru.practicum.telemetry.model.sensor.SensorEventType;
+import net.devh.boot.grpc.server.service.GrpcService;
 import ru.practicum.telemetry.service.handler.hub.HubEventHandler;
 import ru.practicum.telemetry.service.handler.sensor.SensorEventHandler;
+import ru.yandex.practicum.grpc.telemetry.collector.CollectorControllerGrpc;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 
 import java.util.List;
 import java.util.Map;
@@ -17,38 +18,59 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestController
-@RequestMapping("/events")
-public class CollectorController {
-    private final Map<SensorEventType, SensorEventHandler> sensorEventHandlers;
-    private final Map<HubEventType, HubEventHandler> hubEventHandlers;
+@GrpcService
+public class CollectorController extends CollectorControllerGrpc.CollectorControllerImplBase {
+    private final Map<SensorEventProto.PayloadCase, SensorEventHandler> sensorEventHandlers;
+    private final Map<HubEventProto.PayloadCase, HubEventHandler> hubEventHandlers;
 
     public CollectorController(List<SensorEventHandler> sensorEventHandlers, List<HubEventHandler> hubEventHandlers) {
         this.sensorEventHandlers = sensorEventHandlers.stream().collect(Collectors.toMap(SensorEventHandler::getEventType, Function.identity()));
         this.hubEventHandlers = hubEventHandlers.stream().collect(Collectors.toMap(HubEventHandler::getEventType, Function.identity()));
     }
 
-    @PostMapping("/sensors")
-    @ResponseStatus(HttpStatus.OK)
-    public void collectSensorEvent(@Valid @RequestBody SensorEvent event) {
-        if (sensorEventHandlers.containsKey(event.getType())) {
-            log.info("Collecting sensor event: {}", event);
-            sensorEventHandlers.get(event.getType()).handle(event);
-        } else {
-            log.error("Unknown sensor type: {}", event.getType());
-            throw new IllegalArgumentException("Unknown event type: " + event.getType());
+    @Override
+    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
+        try {
+            if (sensorEventHandlers.containsKey(request.getPayloadCase())) {
+                log.info("Collecting sensor event: {}", request.getPayloadCase());
+                sensorEventHandlers.get(request.getPayloadCase()).handle(request);
+            } else {
+                log.error("Unknown sensor type: {}", request.getPayloadCase());
+                throw new IllegalArgumentException("Unknown event type: " + request.getPayloadCase());
+            }
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error collecting sensor event, exception: {}", e.getMessage());
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL
+                            .withDescription(e.getLocalizedMessage())
+                            .withCause(e)
+            ));
         }
     }
 
-    @PostMapping("/hubs")
-    @ResponseStatus(HttpStatus.OK)
-    public void collectHubEvent(@Valid @RequestBody HubEvent event) {
-        if (hubEventHandlers.containsKey(event.getType())) {
-            log.info("Collecting hub event: {}", event);
-            hubEventHandlers.get(event.getType()).handle(event);
-        } else {
-            log.error("Unknown hub type: {}", event.getType());
-            throw new IllegalArgumentException("Unknown event type: " + event.getType());
+    @Override
+    public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
+        try {
+            if (hubEventHandlers.containsKey(request.getPayloadCase())) {
+                log.info("Collecting hub event: {}", request.getPayloadCase());
+                hubEventHandlers.get(request.getPayloadCase()).handle(request);
+            } else {
+                log.error("Unknown hub type: {}", request.getPayloadCase());
+                throw new IllegalArgumentException("Unknown event type: " + request.getPayloadCase());
+            }
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error collecting hub event, exception: {}", e.getMessage());
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL
+                            .withDescription(e.getLocalizedMessage())
+                            .withCause(e)
+            ));
         }
     }
 }
