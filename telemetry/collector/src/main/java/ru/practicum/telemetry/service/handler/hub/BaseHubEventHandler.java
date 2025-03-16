@@ -3,8 +3,10 @@ package ru.practicum.telemetry.service.handler.hub;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import ru.practicum.telemetry.kafka.EventKafkaProducer;
-import ru.practicum.telemetry.model.hub.HubEvent;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+
+import java.time.Instant;
 
 import static ru.practicum.telemetry.kafka.KafkaTopic.HUBS_EVENTS;
 
@@ -17,8 +19,8 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
     }
 
     @Override
-    public void handle(HubEvent event) {
-        if (!event.getType().equals(getEventType())) {
+    public void handle(HubEventProto event) {
+        if (!event.getPayloadCase().equals(getEventType())) {
             throw new IllegalArgumentException("Event type mismatch");
         }
 
@@ -26,13 +28,13 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
 
         HubEventAvro avro = HubEventAvro.newBuilder()
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(event.getTimestamp().getSeconds(), event.getTimestamp().getNanos()))
                 .setPayload(payload)
                 .build();
 
         log.info("Hub event received: {}", avro);
-        producer.send(avro, event.getHubId(), event.getTimestamp(), HUBS_EVENTS);
+        producer.send(avro, avro.getHubId(), avro.getTimestamp(), HUBS_EVENTS);
     }
 
-    protected abstract T mapToAvro(HubEvent event);
+    protected abstract T mapToAvro(HubEventProto event);
 }
