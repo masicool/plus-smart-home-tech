@@ -1,3 +1,3 @@
-# plus=smart-home-tech
+# plus-smart-home-tech
 
-Спринт 19. Этап 1. Collector
+Спринт 20.
