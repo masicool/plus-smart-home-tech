@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: analyzer
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernete:
+      ddl-auto: none
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6542/scenario
+    username: main
+    password: main
+
+logging:
+  level:
+    ru.yandex.practicum: TRACE
+    org:
+      springframework: ERROR
+      apache.kafka: WARN
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+analyzer:
+  kafka:
+    hub-event-consumer-props:
+      bootstrap.servers: localhost:9092
+      group.id: "analyzer-hub-event-group"
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value.deserializer: kafka.serializer.SensorEventDeserializer
+      enable.auto.commit: false
+    snapshot-consumer-props:
+      bootstrap.servers: localhost:9092
+      group.id: "aggregator-snapshot-group"
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value.deserializer: kafka.serializer.SensorEventDeserializer
+      enable.auto.commit: false
+    topics:
+      hubs-events: telemetry.hubs.v1
+      sensors-snapshots: telemetry.snapshots.v1
