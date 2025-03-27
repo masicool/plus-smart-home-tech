@@ -24,7 +24,7 @@ public class SnapshotProcessor {
     private final SnapshotHandler snapshotHandler;
 
     public SnapshotProcessor(KafkaConfig kafkaConfig, SnapshotHandler snapshotHandler) {
-        consumer = new KafkaConsumer<>(kafkaConfig.getHubEventConsumerProps());
+        consumer = new KafkaConsumer<>(kafkaConfig.getSnapshotConsumerProps());
         topics = kafkaConfig.getTopics();
         this.snapshotHandler = snapshotHandler;
     }

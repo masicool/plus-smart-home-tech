@@ -32,12 +32,14 @@ analyzer:
   kafka:
     hub-event-consumer-props:
       bootstrap.servers: localhost:9092
+      client.id: "hubConsumer"
       group.id: "analyzer-hub-event-group"
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value.deserializer: kafka.serializer.HubEventDeserializer
       enable.auto.commit: false
     snapshot-consumer-props:
       bootstrap.servers: localhost:9092
+      client.id: "snapshotConsumer"
       group.id: "aggregator-snapshot-group"
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value.deserializer: kafka.serializer.SensorSnapshotDeserializer

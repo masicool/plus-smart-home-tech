@@ -86,8 +86,12 @@ public class SnapshotHandler {
                 return checkCondition(lightSensorAvro.getLuminosity(), condition.getOperation(), condition.getValue());
             }
             case TEMPERATURE -> {
-                TemperatureSensorAvro temperatureSensorAvro = (TemperatureSensorAvro) sensorStateAvro.getData();
-                return checkCondition(temperatureSensorAvro.getTemperatureC(), condition.getOperation(), condition.getValue());
+                if (sensorStateAvro.getData() instanceof ClimateSensorAvro temperatureSensorAvro) {
+                    return checkCondition(temperatureSensorAvro.getTemperatureC(), condition.getOperation(), condition.getValue());
+                } else {
+                    TemperatureSensorAvro temperatureSensorAvro = (TemperatureSensorAvro) sensorStateAvro.getData();
+                    return checkCondition(temperatureSensorAvro.getTemperatureC(), condition.getOperation(), condition.getValue());
+                }
             }
             default -> throw new IllegalStateException("Unexpected condition type: " + condition.getType());
         }

@@ -22,7 +22,7 @@ public class Scenario {
 
     private String name;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyColumn(
             table = "scenario_conditions",
             name = "sensor_id")
@@ -32,7 +32,7 @@ public class Scenario {
             inverseJoinColumns = @JoinColumn(name = "condition_id"))
     private Map<String, Condition> conditions = new HashMap<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyColumn(
             table = "scenario_actions",
             name = "sensor_id")

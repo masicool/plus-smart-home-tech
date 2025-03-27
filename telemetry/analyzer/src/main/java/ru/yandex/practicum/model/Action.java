@@ -19,9 +19,4 @@ public class Action {
     private DeviceActionType type;
 
     private int value;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scenario_id", nullable = false)
-    @ToString.Exclude
-    private Scenario scenario;
 }
