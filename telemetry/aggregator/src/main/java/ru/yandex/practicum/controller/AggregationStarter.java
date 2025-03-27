@@ -52,6 +52,9 @@ public class AggregationStarter {
             // подписка на топик
             consumer.subscribe(List.of(topics.get(KafkaTopic.SENSORS_EVENTS)));
 
+            // регистрируем хук при завершении JVM
+            Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
+
             // Цикл обработки событий
             while (true) {
                 ConsumerRecords<String, SensorEventAvro> records = consumer.poll(CONSUME_ATTEMPT_TIMEOUT);

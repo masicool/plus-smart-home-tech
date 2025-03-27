@@ -17,7 +17,7 @@ aggregator:
       "key.serializer": org.apache.kafka.common.serialization.StringSerializer
       "value.serializer": kafka.serializer.GeneralAvroSerializer
     consumer-props:
-      bootstrap.servers": localhost:9092
+      "bootstrap.servers": localhost:9092
       "group.id": "aggregator-group"
       "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
       "value.deserializer": kafka.serializer.SensorEventDeserializer
