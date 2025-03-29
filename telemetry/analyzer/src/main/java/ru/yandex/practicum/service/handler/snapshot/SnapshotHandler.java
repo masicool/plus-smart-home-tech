@@ -4,6 +4,7 @@ import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
@@ -26,6 +27,7 @@ public class SnapshotHandler {
     private final ScenarioRepository scenarioRepository;
     private final HubRouterGrpcClient hubRouterGrpcClient;
 
+    @Transactional(readOnly = true)
     public void handle(SensorsSnapshotAvro snapshot) {
         List<Scenario> scenariosToExecute = scenarioRepository.findByHubId(snapshot.getHubId()).stream()
                 .filter(o -> checkScenarioConditions(o.getConditions(), snapshot))
