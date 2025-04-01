@@ -11,6 +11,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 import ru.yandex.practicum.model.*;
 import ru.yandex.practicum.repository.ScenarioRepository;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +34,8 @@ public class ScenarioAddedHubEventHandler implements HubEventHandler {
         scenario = foundScenario.orElseGet(() -> Scenario.builder()
                 .hubId(event.getHubId())
                 .name(scenarioAddedEventAvro.getName())
+                .actions(new HashMap<>())
+                .conditions(new HashMap<>())
                 .build());
 
         Map<String, Condition> conditions = scenarioAddedEventAvro.getConditions().stream()
