@@ -33,6 +33,11 @@ public class ErrorHandlerController {
         return buildResponseEntity(ex, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(RemoteServiceException.class)
+    public ResponseEntity<ApiError> handleRemoteServiceException(RemoteServiceException ex) {
+        return buildResponseEntity(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ResponseEntity<ApiError> buildResponseEntity(Exception ex, HttpStatus status) {
         log.warn(ex.getMessage());
         return new ResponseEntity<>(

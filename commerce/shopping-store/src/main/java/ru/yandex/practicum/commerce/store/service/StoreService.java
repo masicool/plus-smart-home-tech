@@ -57,7 +57,7 @@ public class StoreService {
         log.info("Removing product from store: {}", productID);
         Product product = findProduct(productID);
         product.setProductState(ProductState.DEACTIVATE);
-        storeRepository.save(product);
+        storeRepository.saveAndFlush(product);
         log.info("Removed product from store: {}", productID);
     }
 

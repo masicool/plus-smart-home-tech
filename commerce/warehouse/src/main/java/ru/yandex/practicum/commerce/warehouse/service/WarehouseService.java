@@ -1,8 +1,10 @@
 package ru.yandex.practicum.commerce.warehouse.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.commerce.dto.cart.ShoppingCartDto;
@@ -12,10 +14,7 @@ import ru.yandex.practicum.commerce.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.commerce.dto.warehouse.AddressDto;
 import ru.yandex.practicum.commerce.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.commerce.dto.warehouse.NewProductInWarehouseRequest;
-import ru.yandex.practicum.commerce.exception.NoSpecifiedProductInWarehouseException;
-import ru.yandex.practicum.commerce.exception.ProductInShoppingCartLowQuantityInWarehouse;
-import ru.yandex.practicum.commerce.exception.ProductNotFoundException;
-import ru.yandex.practicum.commerce.exception.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.commerce.exception.*;
 import ru.yandex.practicum.commerce.warehouse.feign.ShoppingStoreClient;
 import ru.yandex.practicum.commerce.warehouse.model.Dimension;
 import ru.yandex.practicum.commerce.warehouse.model.WarehouseProduct;
@@ -108,9 +107,13 @@ public class WarehouseService {
                     .productId(request.getProductId())
                     .quantityState(getQuantityState(warehouseProduct.getQuantity()))
                     .build());
-            log.info("Quantity state for product in shopping store: {} is set", shoppingStoreClient);
-        } catch (Exception e) {
-            throw new ProductNotFoundException("Error during setting product quantity state for product in shopping store");
+            log.info("Quantity state for product in shopping store: {} is set", warehouseProduct);
+        } catch (FeignException ex) {
+            if (ex.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new ProductNotFoundException("Error during setting product quantity state for product in shopping store");
+            } else {
+                throw new RemoteServiceException("Error in the remote service 'shopping-store'");
+            }
         }
     }
 

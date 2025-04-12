@@ -23,14 +23,12 @@ public class CartController implements ShoppingCartApi {
     private final CartService cartService;
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto getShoppingCart(String username) {
         log.info("Received request to get shopping cart for user: {}", username);
         return cartService.getShoppingCart(username);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Long> products) {
         log.info("Received request to add product to shopping cart: {}", username);
         return cartService.addProductToShoppingCart(username, products);
@@ -44,14 +42,12 @@ public class CartController implements ShoppingCartApi {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto removeFromShoppingCart(String username, Set<UUID> products) {
         log.info("Received request to remove product from shopping cart: {}", username);
         return cartService.removeFromShoppingCart(username, products);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest request) {
         log.info("Received request to change product quantity for user: {}", username);
         return cartService.changeProductQuantity(username, request);

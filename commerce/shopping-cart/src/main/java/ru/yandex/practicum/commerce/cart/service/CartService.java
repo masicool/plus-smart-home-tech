@@ -1,8 +1,10 @@
 package ru.yandex.practicum.commerce.cart.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.commerce.cart.feign.WarehouseClient;
@@ -10,10 +12,7 @@ import ru.yandex.practicum.commerce.cart.model.Cart;
 import ru.yandex.practicum.commerce.cart.repository.CartRepository;
 import ru.yandex.practicum.commerce.dto.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.commerce.dto.cart.ShoppingCartDto;
-import ru.yandex.practicum.commerce.exception.NoProductsInShoppingCartException;
-import ru.yandex.practicum.commerce.exception.NotAuthorizedUserException;
-import ru.yandex.practicum.commerce.exception.ProductInShoppingCartLowQuantityInWarehouse;
-import ru.yandex.practicum.commerce.exception.ShoppingCartDeactivationException;
+import ru.yandex.practicum.commerce.exception.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,8 @@ public class CartService {
     public ShoppingCartDto getShoppingCart(String username) {
         log.info("Getting shopping cart for user: {}", username);
         checkUser(username);
-        Cart cart = getCartByUsername(username);
+        // если у пользователя еще нет корзины товаров, то создаем пустую корзину
+        Cart cart = cartRepository.findCartByUsername(username).orElse(getNewCart(username));
         ShoppingCartDto shoppingCartDto = modelMapper.map(cart, ShoppingCartDto.class);
         log.info("Shopping cart for user: {} has been received", username);
         return shoppingCartDto;
@@ -46,11 +46,7 @@ public class CartService {
             return null;
         }
         Cart cart = cartRepository.findCartByUsername(username)
-                .orElse(Cart.builder()
-                        .username(username)
-                        .products(new HashMap<>())
-                        .isActive(true)
-                        .build());
+                .orElse(getNewCart(username));
 
         log.info("Checking deactivate status for shopping cart {}", cart);
         // проверка на деактивацию корзины
@@ -69,8 +65,12 @@ public class CartService {
             ShoppingCartDto cartDto = modelMapper.map(cartRepository.save(cart), ShoppingCartDto.class);
             log.info("Products has been added to shopping cart {}", cartDto);
             return cartDto;
-        } catch (Exception e) {
-            throw new ProductInShoppingCartLowQuantityInWarehouse("Shopping cart has not passed the stock check");
+        } catch (FeignException ex) {
+            if (ex.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new ProductInShoppingCartLowQuantityInWarehouse("Shopping cart has not passed the stock check");
+            } else {
+                throw new RemoteServiceException("Error in the remote service 'warehouse");
+            }
         }
     }
 
@@ -110,9 +110,23 @@ public class CartService {
             throw new NoProductsInShoppingCartException("No product with ID = " + request.getProductId() + " in shopping cart");
         }
         currProducts.put(request.getProductId(), request.getNewQuantity());
-        ShoppingCartDto shoppingCartDto = modelMapper.map(cartRepository.save(cart), ShoppingCartDto.class);
-        log.info("Products from shopping cart {} has been changed", cart);
-        return shoppingCartDto;
+
+        // проверим кол-во товаров на складе из корзины
+        // если не было исключения, значит кол-во товаров на складе достаточное
+        try {
+            log.info("Checking product quantity for shopping cart {}", cart);
+            warehouseClient.checkProductQuantityEnoughForShoppingCart(modelMapper.map(cart, ShoppingCartDto.class));
+            log.info("Product quantity for shopping cart {} has been checked", cart);
+            ShoppingCartDto cartDto = modelMapper.map(cartRepository.save(cart), ShoppingCartDto.class);
+            log.info("Products from shopping cart {} has been changed", cart);
+            return cartDto;
+        } catch (FeignException ex) {
+            if (ex.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new ProductInShoppingCartLowQuantityInWarehouse("Shopping cart has not passed the stock check");
+            } else {
+                throw new RemoteServiceException("Error in the remote service 'warehouse");
+            }
+        }
     }
 
     private void checkUser(String username) {
@@ -124,5 +138,13 @@ public class CartService {
     private Cart getCartByUsername(String username) {
         return cartRepository.findCartByUsername(username)
                 .orElseThrow(() -> new NoProductsInShoppingCartException("No cart found for username = " + username));
+    }
+
+    private Cart getNewCart(String username) {
+        return Cart.builder()
+                .username(username)
+                .products(new HashMap<>())
+                .isActive(true)
+                .build();
     }
 }

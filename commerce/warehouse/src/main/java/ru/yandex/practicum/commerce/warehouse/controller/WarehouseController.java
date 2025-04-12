@@ -2,7 +2,9 @@ package ru.yandex.practicum.commerce.warehouse.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.commerce.api.WarehouseApi;
 import ru.yandex.practicum.commerce.dto.cart.ShoppingCartDto;
@@ -20,6 +22,7 @@ public class WarehouseController implements WarehouseApi {
     private final WarehouseService warehouseService;
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public void newProductInWarehouse(NewProductInWarehouseRequest request) {
         log.info("Received request for new product in warehouse {}", request);
         warehouseService.newProductInWarehouse(request);
@@ -32,6 +35,7 @@ public class WarehouseController implements WarehouseApi {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public void addProductToWarehouse(AddProductToWarehouseRequest request) {
         log.info("Received request for add product to warehouse {}", request);
         warehouseService.addProductToWarehouse(request);

@@ -24,21 +24,18 @@ public class StoreController implements ShoppingStoreApi {
     private final StoreService storeService;
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
         log.info("Received request to getProducts for category: {}", category);
         return storeService.getProducts(category, pageable);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ProductDto createNewProduct(ProductDto productDto) {
         log.info("Received request to create new product: {}", productDto);
         return storeService.createNewProduct(productDto);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ProductDto updateProduct(ProductDto productDto) {
         log.info("Received request to update product: {}", productDto);
         return storeService.updateProduct(productDto);
@@ -59,7 +56,6 @@ public class StoreController implements ShoppingStoreApi {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ProductDto getProduct(UUID productId) {
         log.info("Received request to get product by id: {}", productId);
         return storeService.getProduct(productId);
