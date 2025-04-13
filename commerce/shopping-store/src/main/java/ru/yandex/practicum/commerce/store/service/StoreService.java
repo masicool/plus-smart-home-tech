@@ -3,11 +3,13 @@ package ru.yandex.practicum.commerce.store.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.commerce.dto.store.*;
+import ru.yandex.practicum.commerce.dto.store.ProductCategory;
+import ru.yandex.practicum.commerce.dto.store.ProductDto;
+import ru.yandex.practicum.commerce.dto.store.ProductState;
+import ru.yandex.practicum.commerce.dto.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.commerce.exception.ProductNotFoundException;
 import ru.yandex.practicum.commerce.store.model.Product;
 import ru.yandex.practicum.commerce.store.repository.StoreRepository;
@@ -25,8 +27,7 @@ public class StoreService {
     @Transactional(readOnly = true)
     public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
         log.info("Getting products for category: {}", category);
-        PageRequest page = PageRequest.of(pageable.getPage(), pageable.getSize(), Sort.by(pageable.getSort()));
-        List<ProductDto> productDtos = storeRepository.findAllByProductCategory(category, page).stream()
+        List<ProductDto> productDtos = storeRepository.findAllByProductCategory(category, pageable).stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
                 .toList();
         log.info("Found {} products", productDtos.size());

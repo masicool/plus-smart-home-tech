@@ -1,8 +1,8 @@
 package ru.yandex.practicum.commerce.api;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.commerce.dto.store.Pageable;
 import ru.yandex.practicum.commerce.dto.store.ProductCategory;
 import ru.yandex.practicum.commerce.dto.store.ProductDto;
 import ru.yandex.practicum.commerce.dto.store.SetProductQuantityStateRequest;

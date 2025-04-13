@@ -2,12 +2,12 @@ package ru.yandex.practicum.commerce.store.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.commerce.api.ShoppingStoreApi;
-import ru.yandex.practicum.commerce.dto.store.Pageable;
 import ru.yandex.practicum.commerce.dto.store.ProductCategory;
 import ru.yandex.practicum.commerce.dto.store.ProductDto;
 import ru.yandex.practicum.commerce.dto.store.SetProductQuantityStateRequest;
