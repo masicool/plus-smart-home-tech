@@ -1,3 +1,3 @@
 # plus-smart-home-tech
 
-Спринт 21.
+Спринт 22.
