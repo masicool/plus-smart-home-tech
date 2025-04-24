@@ -10,6 +10,7 @@ import ru.yandex.practicum.commerce.delivery.service.DeliveryService;
 import ru.yandex.practicum.commerce.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.commerce.dto.order.OrderDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -46,7 +47,7 @@ public class DeliveryController implements DeliveryApi {
     }
 
     @Override
-    public float deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         log.info("Received request to calculate delivery cost for order ID: {}", orderDto);
         return deliveryService.deliveryCost(orderDto);
     }

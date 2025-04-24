@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -14,9 +15,9 @@ import java.util.UUID;
 public class PaymentDto {
     UUID paymentId; // идентификатор оплаты
 
-    float totalPayment; // общая стоимость
+    BigDecimal totalPayment; // общая стоимость
 
-    float deliveryTotal; // стоимость доставки
+    BigDecimal deliveryTotal; // стоимость доставки
 
-    float feeTotal; // стоимость налога
+    BigDecimal feeTotal; // стоимость налога
 }

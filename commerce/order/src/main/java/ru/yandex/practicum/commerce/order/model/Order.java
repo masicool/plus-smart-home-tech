@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.commerce.dto.order.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,11 +39,11 @@ public class Order {
 
     boolean fragile; // признак хрупкости заказа
 
-    float totalPrice; // общая стоимость заказа
+    BigDecimal totalPrice; // общая стоимость заказа
 
-    float deliveryPrice; // стоимость доставки
+    BigDecimal deliveryPrice; // стоимость доставки
 
-    float productPrice; // стоимость товаров в заказе
+    BigDecimal productPrice; // стоимость товаров в заказе
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(

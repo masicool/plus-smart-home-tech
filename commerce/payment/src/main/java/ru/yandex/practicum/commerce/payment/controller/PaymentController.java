@@ -8,6 +8,7 @@ import ru.yandex.practicum.commerce.dto.order.OrderDto;
 import ru.yandex.practicum.commerce.dto.payment.PaymentDto;
 import ru.yandex.practicum.commerce.payment.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -23,7 +24,7 @@ public class PaymentController implements PaymentApi {
     }
 
     @Override
-    public float getTotalCost(OrderDto order) {
+    public BigDecimal getTotalCost(OrderDto order) {
         log.info("Received request to calculate total cost for order {}", order);
         return paymentService.getTotalCost(order);
     }
@@ -35,7 +36,7 @@ public class PaymentController implements PaymentApi {
     }
 
     @Override
-    public float productCost(OrderDto order) {
+    public BigDecimal productCost(OrderDto order) {
         log.info("Received request to calculate products cost for order {}", order);
         return paymentService.productCost(order);
     }

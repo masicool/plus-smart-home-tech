@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS orders
     delivery_weight  DOUBLE PRECISION,
     delivery_volume  DOUBLE PRECISION,
     fragile          BOOLEAN,
-    total_price      REAL,
-    delivery_price   REAL,
-    product_price    REAL
+    total_price      DECIMAL,
+    delivery_price   DECIMAL,
+    product_price    DECIMAL
 );
 
 CREATE TABLE IF NOT EXISTS order_products

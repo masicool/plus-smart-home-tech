@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.commerce.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.commerce.dto.order.OrderDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -54,5 +55,5 @@ public interface DeliveryApi {
      * @return - полная стоимость заказа
      */
     @PostMapping("/cost")
-    float deliveryCost(@RequestBody @NotNull OrderDto orderDto);
+    BigDecimal deliveryCost(@RequestBody @NotNull OrderDto orderDto);
 }

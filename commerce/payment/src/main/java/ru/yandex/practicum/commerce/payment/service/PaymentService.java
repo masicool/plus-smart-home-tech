@@ -19,6 +19,8 @@ import ru.yandex.practicum.commerce.payment.feign.ShoppingStoreClient;
 import ru.yandex.practicum.commerce.payment.model.Payment;
 import ru.yandex.practicum.commerce.payment.repository.PaymentRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class PaymentService {
-    private static final float TAX_RATE = 10f; // налог НДС в процентах
+    private static final BigDecimal TAX_RATE = new BigDecimal(10); // налог НДС в процентах
     private final ModelMapper modelMapper;
     private final PaymentRepository paymentRepository;
     private final ShoppingStoreClient shoppingStoreClient;
@@ -36,8 +38,8 @@ public class PaymentService {
     @Transactional
     public PaymentDto payment(OrderDto order) {
         log.info("Saving payment for order {}", order);
-        float totalPayment = getTotalCost(order);
-        float deliveryTotal;
+        BigDecimal totalPayment = getTotalCost(order);
+        BigDecimal deliveryTotal;
 
         try {
             deliveryTotal = deliveryClient.deliveryCost(order);
@@ -48,7 +50,7 @@ public class PaymentService {
             throw new RemoteServiceException("Error in the remote service 'delivery'");
         }
 
-        float feeTotal = productCost(order) * TAX_RATE / 100;
+        BigDecimal feeTotal = productCost(order).multiply(TAX_RATE.divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP));
 
         Payment payment = Payment.builder()
                 .orderId(order.getOrderId())
@@ -63,18 +65,18 @@ public class PaymentService {
         return modelMapper.map(savedPayment, PaymentDto.class);
     }
 
-    public float getTotalCost(OrderDto order) {
+    public BigDecimal getTotalCost(OrderDto order) {
         log.info("Calculating total cost for order {}", order);
-        float productCost = productCost(order);
-        float tax = productCost * TAX_RATE / 100;
-        float deliveryCost;
+        BigDecimal productCost = productCost(order);
+        BigDecimal tax = productCost.multiply(TAX_RATE.divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP));
+        BigDecimal deliveryCost;
         try {
             deliveryCost = deliveryClient.deliveryCost(order);
         } catch (FeignException ex) {
             throw new RemoteServiceException("Error in the remote service 'order'");
         }
         log.info("Total cost for order {} has been calculated", order);
-        return productCost + tax + deliveryCost;
+        return productCost.add(tax).add(deliveryCost);
     }
 
     @Transactional
@@ -94,12 +96,12 @@ public class PaymentService {
         log.info("Payment successful state has been set for payment with ID: {}", paymentId);
     }
 
-    public float productCost(OrderDto order) {
+    public BigDecimal productCost(OrderDto order) {
         log.info("Calculating product cost for order {}", order);
-        float productCost = 0f;
+        BigDecimal productCost = BigDecimal.ZERO;
         for (Map.Entry<UUID, Long> entry : order.getProducts().entrySet()) {
             ProductDto productDto = shoppingStoreClient.getProduct(entry.getKey());
-            productCost += productDto.getPrice() * entry.getValue();
+            productCost = productCost.add(productDto.getPrice().multiply(BigDecimal.valueOf(entry.getValue())));
         }
         log.info("Calculated product cost for order {}", order);
         return productCost;

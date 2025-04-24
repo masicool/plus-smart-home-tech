@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.commerce.dto.payment.PaymentState;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -23,11 +24,11 @@ public class Payment {
 
     UUID orderId;
 
-    float totalPayment;
+    BigDecimal totalPayment;
 
-    float deliveryTotal;
+    BigDecimal deliveryTotal;
 
-    float feeTotal;
+    BigDecimal feeTotal;
 
     @Enumerated(EnumType.STRING)
     PaymentState paymentState;

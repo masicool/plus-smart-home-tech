@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.commerce.dto.order.OrderDto;
 import ru.yandex.practicum.commerce.dto.payment.PaymentDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -30,7 +31,7 @@ public interface PaymentApi {
      * @return - полная стоимость заказа
      */
     @PostMapping("/totalCost")
-    float getTotalCost(@RequestBody @Valid OrderDto order);
+    BigDecimal getTotalCost(@RequestBody @Valid OrderDto order);
 
     /**
      * Метод для эмуляции успешной оплаты в платежном шлюзе
@@ -47,7 +48,7 @@ public interface PaymentApi {
      * @return - стоимость товаров в заказе
      */
     @PostMapping("/productCost")
-    float productCost(@RequestBody @NotNull OrderDto order);
+    BigDecimal productCost(@RequestBody @NotNull OrderDto order);
 
     /**
      * Метод для эмуляции отказа в оплате платежного шлюза

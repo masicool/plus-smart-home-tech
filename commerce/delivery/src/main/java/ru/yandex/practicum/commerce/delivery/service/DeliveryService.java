@@ -19,19 +19,20 @@ import ru.yandex.practicum.commerce.exception.NoDeliveryFoundException;
 import ru.yandex.practicum.commerce.exception.NoOrderFoundException;
 import ru.yandex.practicum.commerce.exception.RemoteServiceException;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeliveryService {
-    private static final float BASE_RATE = 5.0f; // базовая ставка доставки
-    private static final float ADDRESS1_RATE = 1.0f; // коэффициент умножения для доставки по адресу 1
-    private static final float ADDRESS2_RATE = 2.0f; // коэффициент умножения для доставки по адресу 2
-    private static final float FRAGILE_RATE = 0.2f; // коэффициент умножения для хрупкого товара
-    private static final float WEIGHT_RATE = 0.3f; // коэффициент умножения для веса
-    private static final float VOLUME_RATE = 0.2f; // коэффициент умножения для объема
-    private static final float STREET_RATE = 0.2f; // коэффициент умножения для доставки на другие улицы
+    private static final BigDecimal BASE_RATE = BigDecimal.valueOf(5.0); // базовая ставка доставки
+    private static final BigDecimal ADDRESS1_RATE = BigDecimal.valueOf(1.0); // коэффициент умножения для доставки по адресу 1
+    private static final BigDecimal ADDRESS2_RATE = BigDecimal.valueOf(2.0); // коэффициент умножения для доставки по адресу 2
+    private static final BigDecimal FRAGILE_RATE = BigDecimal.valueOf(0.2); // коэффициент умножения для хрупкого товара
+    private static final BigDecimal WEIGHT_RATE = BigDecimal.valueOf(0.3); // коэффициент умножения для веса
+    private static final BigDecimal VOLUME_RATE = BigDecimal.valueOf(0.2); // коэффициент умножения для объема
+    private static final BigDecimal STREET_RATE = BigDecimal.valueOf(0.2); // коэффициент умножения для доставки на другие улицы
     private final DeliveryRepository deliveryRepository;
     private final ModelMapper modelMapper;
     private final OrderClient orderClient;
@@ -102,28 +103,28 @@ public class DeliveryService {
         log.info("Delivery status order with ID: {} has been failed", orderId);
     }
 
-    public float deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         log.info("Calculate delivery cost for order ID: {}", orderDto);
-        float deliveryCost = BASE_RATE;
+        BigDecimal deliveryCost = BASE_RATE;
         Delivery delivery = getDeliveryByDeliveryId(orderDto.getDeliveryId());
         Address fromAddress = delivery.getFromAddress();
         Address toAddress = delivery.getToAddress();
 
         if (fromAddress.toString().contains("ADDRESS_1")) {
-            deliveryCost = BASE_RATE * ADDRESS1_RATE;
+            deliveryCost = BASE_RATE.multiply(ADDRESS1_RATE);
         } else if (fromAddress.toString().contains("ADDRESS_2")) {
-            deliveryCost += BASE_RATE * ADDRESS2_RATE;
+            deliveryCost = deliveryCost.add(BASE_RATE.multiply(ADDRESS2_RATE));
         }
 
         if (orderDto.isFragile()) {
-            deliveryCost += deliveryCost * FRAGILE_RATE;
+            deliveryCost = deliveryCost.add(deliveryCost.multiply(FRAGILE_RATE));
         }
 
-        deliveryCost += (float) (orderDto.getDeliveryWeight() * WEIGHT_RATE);
-        deliveryCost += (float) (orderDto.getDeliveryVolume() * VOLUME_RATE);
+        deliveryCost = deliveryCost.add(WEIGHT_RATE.multiply(BigDecimal.valueOf(orderDto.getDeliveryWeight())));
+        deliveryCost = deliveryCost.add(VOLUME_RATE.multiply(BigDecimal.valueOf(orderDto.getDeliveryVolume())));
 
         if (!fromAddress.getStreet().equals(toAddress.getStreet())) {
-            deliveryCost += deliveryCost * STREET_RATE;
+            deliveryCost = deliveryCost.add(deliveryCost.multiply(STREET_RATE));
         }
 
         log.info("Delivery cost has been calculated: {}", deliveryCost);
@@ -134,5 +135,4 @@ public class DeliveryService {
         return deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new NoDeliveryFoundException("Not found delivery with ID: " + deliveryId));
     }
-
 }
