@@ -53,12 +53,12 @@
 - расчет стоимость доставки заказа
 - принятие товара в доставку
 ### API
-[Спецификация модуля delivery](https://github.com/masicool/plus-smart-home-tech/blob/main/delivery-spec.json)
-[Спецификация модуля order](https://github.com/masicool/plus-smart-home-tech/blob/main/order-spec.json)
-[Спецификация модуля payment](https://github.com/masicool/plus-smart-home-tech/blob/main/payment-spec.json)
-[Спецификация модуля shopping cart](https://github.com/masicool/plus-smart-home-tech/blob/main/shopping-cart-spec.json)
-[Спецификация модуля shopping store](https://github.com/masicool/plus-smart-home-tech/blob/main/shopping-store-spec.json)
-[Спецификация модуля warehouse](https://github.com/masicool/plus-smart-home-tech/blob/main/warehouse-spec.json)
+- [Спецификация модуля delivery](https://github.com/masicool/plus-smart-home-tech/blob/main/delivery-spec.json)
+- [Спецификация модуля order](https://github.com/masicool/plus-smart-home-tech/blob/main/order-spec.json)
+- [Спецификация модуля payment](https://github.com/masicool/plus-smart-home-tech/blob/main/payment-spec.json)
+- [Спецификация модуля shopping cart](https://github.com/masicool/plus-smart-home-tech/blob/main/shopping-cart-spec.json)
+- [Спецификация модуля shopping store](https://github.com/masicool/plus-smart-home-tech/blob/main/shopping-store-spec.json)
+- [Спецификация модуля warehouse](https://github.com/masicool/plus-smart-home-tech/blob/main/warehouse-spec.json)
 
 
 ## 3. Infra - модуль инфраструктуры
